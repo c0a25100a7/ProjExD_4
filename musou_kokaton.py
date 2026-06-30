@@ -152,14 +152,14 @@ class Beam(pg.sprite.Sprite):
     """
     ビームに関するクラス
     """
-    def __init__(self, bird: Bird):
+    def __init__(self, bird: Bird, angle = 0):
         """
         ビーム画像Surfaceを生成する
         引数 bird：ビームを放つこうかとん
         """
         super().__init__()
         self.vx, self.vy = bird.dire
-        angle = math.degrees(math.atan2(-self.vy, self.vx))
+        angle = math.degrees(math.atan2(-self.vy, self.vx)) + angle
         self.image = pg.transform.rotozoom(pg.image.load(f"fig/beam.png"), angle, 1.0)
         self.vx = math.cos(math.radians(angle))
         self.vy = -math.sin(math.radians(angle))
@@ -287,11 +287,29 @@ class EMP:
         pg.display.update()
         time.sleep(0.05)
 
+class Neo_Beam:   #演習課題6
+    """
+    一度に複数方向へビームを発射するクラス
+    消費スコア：なし
+    """
+    def __init__(self, bird: Bird, num: int):
+        self.bird = bird
+        self.num = num  #ビームの本数
+
+    def gen_beams(self):
+        beams = []
+
+        if self.num == 1:
+            beams.append(Beam(self.bird))
+            return beams
+        
+        step = 100 // (self.num - 1)
+
+        for angle in range(-50, 51, step ):
+            beams.append(Beam(self.bird, angle))
+
+        return beams
 #追加機能４：無敵状態
-
-
-
-
 class Life(pg.sprite.Sprite):
 
     def __init__(self, num: int):
@@ -327,10 +345,15 @@ def main():
         key_lst = pg.key.get_pressed()
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                return 0
-            if event.type == pg.KEYDOWN :
+                return
+            if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    beams.add(Beam(bird))
+                    if event.mod & pg.KMOD_LSHIFT:
+                        multi = Neo_Beam(bird, 5)
+                        for beam in multi.gen_beams():
+                            beams.add(beam)
+                    else:
+                        beams.add(Beam(bird))
 
                 if event.key == pg.K_e and score.value >= 20:
                     score.value -= 20  # 消費スコア：20
