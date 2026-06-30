@@ -351,15 +351,13 @@ def main():
             else:
                 bird.change_img(8, screen)  # こうかとん悲しみエフェクト
                 score.update(screen)
+                life.num -= 1
                 pg.display.update()
-                time.sleep(2)
-                return
-            life.num -= 1
-            if life.num == 0:
-                time.sleep(2
-                return
-            else:
-                time.sleep(0.5)
+                if life.num == 0:
+                    time.sleep(2)
+                    return
+                else:
+                    time.sleep(0.5)
 
         bird.update(key_lst, screen)
         beams.update()
